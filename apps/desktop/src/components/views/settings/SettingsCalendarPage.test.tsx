@@ -35,7 +35,7 @@ describe('SettingsCalendarPage', () => {
 
         expect(getByRole('link', { name: /Calendar integration guide/ })).toHaveAttribute(
             'href',
-            'https://github.com/Zhihua-Lee/attention-planner/blob/main/docs/outlook-google-drive-export.md',
+            'https://github.com/Zhihua-Lee/attention-planner-legacy/blob/main/docs/outlook-google-drive-export.md',
         );
     });
 

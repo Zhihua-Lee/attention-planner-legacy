@@ -1,5 +1,5 @@
 blank_issues_enabled: true
 contact_links:
   - name: Report a security vulnerability / 报告安全问题
-    url: https://github.com/Zhihua-Lee/attention-planner/security/advisories/new
+    url: https://github.com/Zhihua-Lee/attention-planner-legacy/security/advisories/new
     about: Please report vulnerabilities privately, not in a public issue.

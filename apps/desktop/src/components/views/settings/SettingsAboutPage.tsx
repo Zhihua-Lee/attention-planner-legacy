@@ -4,7 +4,7 @@ import { ExternalLink, MessageSquare, RefreshCw } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { SettingsFeedbackModal, type FeedbackSubmitInput } from './SettingsFeedbackModal';
 
-const USER_GUIDE_URL = 'https://github.com/Zhihua-Lee/attention-planner/blob/main/docs/attention-planner-user-guide-zh.md';
+const USER_GUIDE_URL = 'https://github.com/Zhihua-Lee/attention-planner-legacy/blob/main/docs/attention-planner-user-guide-zh.md';
 
 type Labels = {
     version: string;
@@ -157,10 +157,10 @@ export function SettingsAboutPage({
                 <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">{t.github}</span>
                     <button
-                        onClick={() => onOpenLink('https://github.com/Zhihua-Lee/attention-planner')}
+                        onClick={() => onOpenLink('https://github.com/Zhihua-Lee/attention-planner-legacy')}
                         className="text-info hover:underline cursor-pointer flex items-center gap-1"
                     >
-                        github.com/Zhihua-Lee/attention-planner
+                        github.com/Zhihua-Lee/attention-planner-legacy
                         <ExternalLink className="w-3 h-3" />
                     </button>
                 </div>
@@ -196,7 +196,7 @@ export function SettingsAboutPage({
                 isConfigured={feedbackConfigured}
                 isOpen={feedbackOpen}
                 onClose={() => setFeedbackOpen(false)}
-                onOpenIssue={() => onOpenLink('https://github.com/Zhihua-Lee/attention-planner/issues/new')}
+                onOpenIssue={() => onOpenLink('https://github.com/Zhihua-Lee/attention-planner-legacy/issues/new')}
                 onSubmit={onSubmitFeedback}
                 t={t}
             />

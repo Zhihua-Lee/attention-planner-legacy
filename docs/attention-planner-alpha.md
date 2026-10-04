@@ -2,7 +2,7 @@
 
 ## Source of truth
 
-- Repository: `https://github.com/Zhihua-Lee/attention-planner`
+- Repository: `https://github.com/Zhihua-Lee/attention-planner-legacy`
 - Upstream baseline: Mindwtr `v1.1.5` (`2dcc77d28200d74190088cabdcd1615aa0c10528`)
 - GitHub is the version and deployment source of truth. A permanent local project checkout is not required; temporary build checkouts should be removed after verification.
 

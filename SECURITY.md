@@ -2,9 +2,9 @@
 
 ## Reporting a vulnerability
 
-Please report vulnerabilities privately through [GitHub security advisories for this repository](https://github.com/Zhihua-Lee/attention-planner/security/advisories/new). Do not open a public issue for anything exploitable.
+Please report vulnerabilities privately through [GitHub security advisories for this repository](https://github.com/Zhihua-Lee/attention-planner-legacy/security/advisories/new). Do not open a public issue for anything exploitable.
 
-请通过本仓库的 [GitHub 私密安全报告](https://github.com/Zhihua-Lee/attention-planner/security/advisories/new) 提交漏洞，不要在公开 issue 中描述可被利用的问题。
+请通过本仓库的 [GitHub 私密安全报告](https://github.com/Zhihua-Lee/attention-planner-legacy/security/advisories/new) 提交漏洞，不要在公开 issue 中描述可被利用的问题。
 
 Include what is affected (PWA, sync broker, remote MCP), steps to reproduce, and the impact you expect. This is a personal project maintained by one person; reports are handled on a best-effort basis.
 

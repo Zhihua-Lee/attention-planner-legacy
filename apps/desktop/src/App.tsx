@@ -214,7 +214,7 @@ const getDesktopReviewTarget = (installSource: InstallSource | null): { label: s
     }
     return {
         label: 'Open GitHub',
-        url: 'https://github.com/Zhihua-Lee/attention-planner',
+        url: 'https://github.com/Zhihua-Lee/attention-planner-legacy',
     };
 };
 
