@@ -450,12 +450,24 @@ async function notificationStub(env: Env, email: string, deviceId: string): Prom
     return env.NOTIFICATION_DEVICES.get(id);
 }
 
+/** The list of an account's push devices, kept in a NotificationDevice of its own (it never holds a subscription). */
+async function deviceRegistry(env: Env, email: string, path: '/register' | '/unregister' | '/devices', deviceId?: string): Promise<string[]> {
+    const stub = await notificationStub(env, email, '__devices__');
+    const response = await stub.fetch(new Request(`https://registry.internal${path}`, {
+        body: JSON.stringify({ deviceId }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+    }));
+    return (await response.json<{ devices: string[] }>()).devices;
+}
+
 async function syncPushDevice(env: Env, email: string, request: Request): Promise<Response> {
     const input = await readJson<{ deviceId?: unknown; reminders?: unknown; subscription?: unknown }>(request);
     const deviceId = validateDeviceId(input.deviceId);
     const subscription = validateSubscription(input.subscription);
     const reminders = validateReminders(input.reminders);
     const stub = await notificationStub(env, email, deviceId);
+    await deviceRegistry(env, email, '/register', deviceId);
     return stub.fetch(new Request('https://device.internal/sync', {
         body: JSON.stringify({ reminders, subscription }),
         headers: { 'Content-Type': 'application/json' },
@@ -465,8 +477,31 @@ async function syncPushDevice(env: Env, email: string, request: Request): Promis
 
 async function deletePushDevice(env: Env, email: string, request: Request): Promise<Response> {
     const input = await readJson<{ deviceId?: unknown }>(request);
-    const stub = await notificationStub(env, email, validateDeviceId(input.deviceId));
+    const deviceId = validateDeviceId(input.deviceId);
+    const stub = await notificationStub(env, email, deviceId);
+    await deviceRegistry(env, email, '/unregister', deviceId);
     return stub.fetch(new Request('https://device.internal/', { method: 'DELETE' }));
+}
+
+/**
+ * Notify every device of this account now, e.g. when an AI proposed changes. The payload stays generic: only an
+ * opaque id travels, and each device fills in the words itself.
+ */
+async function notifyAllDevices(env: Env, email: string, request: Request): Promise<Response> {
+    const input = await readJson<{ id?: unknown }>(request);
+    if (typeof input.id !== 'string' || !/^[A-Za-z0-9_-]{16,64}$/.test(input.id)) return errorJson('Invalid id', 400);
+    const devices = await deviceRegistry(env, email, '/devices');
+    let sent = 0;
+    for (const deviceId of devices) {
+        const stub = await notificationStub(env, email, deviceId);
+        const response = await stub.fetch(new Request('https://device.internal/notify', {
+            body: JSON.stringify({ id: input.id }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+        }));
+        if (response.ok) sent += 1;
+    }
+    return json({ devices: devices.length, scheduled: sent });
 }
 
 async function testPushDevice(env: Env, email: string, request: Request): Promise<Response> {
@@ -518,6 +553,9 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
     }
     if (request.method === 'POST' && path === '/push/test') {
         return testPushDevice(env, email, request);
+    }
+    if (request.method === 'POST' && path === '/push/notify') {
+        return notifyAllDevices(env, email, request);
     }
     if (request.method === 'POST' && path === '/push/unsubscribe') {
         return deletePushDevice(env, email, request);
@@ -684,7 +722,31 @@ export class NotificationDevice {
     }
 
     async fetch(request: Request): Promise<Response> {
-        const path = new URL(request.url).pathname;
+        const url = new URL(request.url);
+        const path = url.pathname;
+        if (url.hostname === 'registry.internal') {
+            // This instance only lists the account's devices.
+            const { deviceId } = await request.json<{ deviceId?: string }>();
+            let devices = (await this.state.storage.get<string[]>('devices')) ?? [];
+            if (path === '/register' && deviceId && !devices.includes(deviceId)) devices = [...devices, deviceId].slice(-20);
+            if (path === '/unregister' && deviceId) devices = devices.filter((d) => d !== deviceId);
+            if (path !== '/devices') await this.state.storage.put('devices', devices);
+            return json({ devices });
+        }
+        if (request.method === 'POST' && path === '/notify') {
+            const config = await this.state.storage.get<DeviceConfig>('config');
+            if (!config) return errorJson('Push is not enabled for this device', 409);
+            const { id } = await request.json<{ id: string }>();
+            const nextConfig: DeviceConfig = {
+                ...config,
+                reminders: [...config.reminders.filter((r) => r.id !== id), { id, fireAt: Date.now() + 1_000 }]
+                    .sort((left, right) => left.fireAt - right.fireAt),
+                updatedAt: Date.now(),
+            };
+            await this.state.storage.put('config', nextConfig);
+            await this.scheduleNext(nextConfig);
+            return json({ scheduled: true });
+        }
         if (request.method === 'POST' && path === '/sync') {
             const input = await request.json<{ reminders: DeviceReminder[]; subscription: PushSubscription }>();
             const config: DeviceConfig = {
