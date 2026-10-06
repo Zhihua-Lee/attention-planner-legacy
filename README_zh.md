@@ -1,5 +1,7 @@
 # Attention Planner
 
+> **已退役。** 这是第一版，从 Mindwtr（AGPL-3.0）分叉而来，保留为只读存档。应用已重写，新仓库是 [Zhihua-Lee/attention-planner](https://github.com/Zhihua-Lee/attention-planner)；[todo.onthat.top](https://todo.onthat.top) 运行的是新版。
+
 一个一次只回答一个问题的个人规划应用：**现在该做什么？**
 它是可安装的 PWA，地址是 **[todo.onthat.top](https://todo.onthat.top)**；可以离线使用，数据通过你自己的 Google Drive 同步。
 

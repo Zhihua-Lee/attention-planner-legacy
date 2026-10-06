@@ -1,5 +1,7 @@
 # Attention Planner
 
+> **Retired.** This is the first version, a fork of Mindwtr (AGPL-3.0), kept read-only for reference. The app was rewritten from scratch and lives at [Zhihua-Lee/attention-planner](https://github.com/Zhihua-Lee/attention-planner); [todo.onthat.top](https://todo.onthat.top) runs the new version.
+
 A personal planning app that answers one question at a time: **what should I do now?**
 It runs as an installable PWA at **[todo.onthat.top](https://todo.onthat.top)**, works offline, and syncs through your own Google Drive.
 
